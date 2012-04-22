@@ -45,7 +45,7 @@ Executable hisualhommits
   Main-is:             src/main/Main.hs
   
   -- Packages needed in order to build this package.
-  Build-depends:       base, haskell-src-exts, filepath, directory, graphviz
+  Build-depends:       base, haskell-src-exts, filepath, directory, graphviz, text
   
   -- Modules not exported by this package.
   -- Other-modules:       

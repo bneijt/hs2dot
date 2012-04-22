@@ -7,8 +7,10 @@ import Control.Monad
 import Data.Maybe
 import Data.List
 import Control.Applicative
-src = "\nimport Distribution.Simple \nmain = putStrLn \"asldkjf\""
-
+import Data.GraphViz.Types.Graph
+import Data.GraphViz.Commands.IO
+import Data.GraphViz.Types.Canonical
+import Data.Text.Lazy (pack)
 
 relations :: Module -> (ModuleName, [ModuleName])
 relations (Module _ name _ _ _ imports _) = (name, map importModule imports)
@@ -43,12 +45,18 @@ edgesFromRelations :: [(ModuleName, [ModuleName])] -> [(String, String)]
 edgesFromRelations (h : t) = (edgesFromRelation h) ++ edgesFromRelations t
 edgesFromRelations _ = []
 
+dotNodes :: [String] -> [DotNode String]
+dotNodes nodes = map (\nodeName -> DotNode nodeName []) nodes
+
+dotEdges :: [(String, String)] -> [DotEdge String]
+dotEdges edges = map (\(a, b) -> DotEdge a b []) edges
+
 main = do
     files <- findHsFiles "."
     maybeRelations <- mapM relationsFrom files
     let relations = catMaybes maybeRelations
     let nodes = nub $ nodesFromRelations $ relations
     let edges = nub $ edgesFromRelations $ relations
---    graph <- mkGraph nodes edges
---    writeDotFile "state.dot" graph
+    let graph = DotGraph False True (Just (Str (pack "h2dot"))) (DotStmts [] [] (dotNodes nodes) (dotEdges edges))
+    writeDotFile "h2dot.dot" graph
     putStrLn $ show edges
