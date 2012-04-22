@@ -40,7 +40,7 @@ Build-type:          Simple
 Cabal-version:       >=1.2
 
 
-Executable hisualhommits
+Executable hs2dot
   -- .hs or .lhs file containing the Main module.
   Main-is:             src/main/Main.hs
   
