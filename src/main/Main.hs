@@ -23,10 +23,12 @@ findHsFiles path = do
     directories <- filterM doesDirectoryExist files
     ((hsFiles ++) . concat) <$> mapM findHsFiles directories
 
+relationsFrom :: FilePath -> IO (Maybe (ModuleName, [ModuleName]))
 relationsFrom fileName = do
     src <- readFile fileName
-    case parseModule src of
-        ParseOk mod -> return $ Just (relations mod)
+    -- (parseFileWithMode (defaultParseMode { fixities = [] } )
+    case parseModuleWithMode (defaultParseMode { fixities = Just [] }) src of
+        ParseOk parsed -> return $ Just (relations parsed)
         ParseFailed _ _ -> return Nothing
 
 --mkGraph nodes edges
@@ -35,6 +37,7 @@ namesFromModules :: [ModuleName] -> [String]
 namesFromModules ((ModuleName name) : t) = [name] ++ namesFromModules t
 namesFromModules _ = []
 
+nodesFromRelations :: [(ModuleName, [ModuleName])] -> [String]
 nodesFromRelations ((ModuleName name, imports) : t) = [name] ++ namesFromModules imports ++ nodesFromRelations t
 nodesFromRelations _ = []
 
@@ -51,12 +54,12 @@ dotNodes nodes = map (\nodeName -> DotNode nodeName []) nodes
 dotEdges :: [(String, String)] -> [DotEdge String]
 dotEdges edges = map (\(a, b) -> DotEdge a b []) edges
 
+main :: IO()
 main = do
     files <- findHsFiles "."
     maybeRelations <- mapM relationsFrom files
-    let relations = catMaybes maybeRelations
-    let nodes = nub $ nodesFromRelations $ relations
-    let edges = nub $ edgesFromRelations $ relations
+    let found = catMaybes maybeRelations
+    let nodes = nub $ nodesFromRelations $ found
+    let edges = nub $ edgesFromRelations $ found
     let graph = DotGraph False True (Just (Str (pack "h2dot"))) (DotStmts [] [] (dotNodes nodes) (dotEdges edges))
     writeDotFile "hs2dot.dot" graph
-    putStrLn $ show edges
