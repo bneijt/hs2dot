@@ -58,5 +58,5 @@ main = do
     let nodes = nub $ nodesFromRelations $ relations
     let edges = nub $ edgesFromRelations $ relations
     let graph = DotGraph False True (Just (Str (pack "h2dot"))) (DotStmts [] [] (dotNodes nodes) (dotEdges edges))
-    writeDotFile "h2dot.dot" graph
+    writeDotFile "hs2dot.dot" graph
     putStrLn $ show edges
