@@ -59,7 +59,7 @@ main = do
     files <- findHsFiles "."
     maybeRelations <- mapM relationsFrom files
     let found = catMaybes maybeRelations
-    let nodes = nub $ nodesFromRelations $ found
-    let edges = nub $ edgesFromRelations $ found
+    let nodes = sort $ nub $ nodesFromRelations $ found
+    let edges = sort $ nub $ edgesFromRelations $ found
     let graph = DotGraph False True (Just (Str (pack "h2dot"))) (DotStmts [] [] (dotNodes nodes) (dotEdges edges))
     writeDotFile "hs2dot.dot" graph
