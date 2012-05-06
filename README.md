@@ -1,7 +1,7 @@
 
 Ready?
 ======
-No
+No. There are better solutions [out there](http://stackoverflow.com/questions/7427094/generate-diagrams-for-haskell-code).
 
 What?
 =====

@@ -9,15 +9,16 @@ if [[ ! ${REPO} = /tmp* ]]; then
     exit 1
 fi
 
-
-mkdir dots
-commits="`git log --pretty=format:%H|head -n 50`"
-for hash in $commits; do
-    git reset --hard "$hash"
-    hs2dot
-    mv hs2dot.dot dots/"$hash".dot
-    dots="$dots ${hash}.dot"
-done
+if [ ! -d dots ]; then
+    mkdir dots
+    commits="`git log --pretty=format:%H`"
+    for hash in $commits; do
+        git reset --hard "$hash"
+        hs2dot
+        mv hs2dot.dot dots/"$hash".dot
+        dots="$dots ${hash}.dot"
+    done
+fi
 
 cd dots
 dotimate $dots
