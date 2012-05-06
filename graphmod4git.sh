@@ -9,6 +9,7 @@ if [[ ! ${REPO} = /tmp* ]]; then
     exit 1
 fi
 
+last_hash=""
 if [ ! -d dots ]; then
     mkdir dots
     commits="`git log --pretty=format:%H`"
@@ -16,13 +17,17 @@ if [ ! -d dots ]; then
         git reset --hard "$hash"
         graphmod -q --no-cluster Main.hs > dots/"$hash".dot
         echo "${hash}.dot" >> dots/index.list
+        if ! cmp "dots/${hash}.dot" "dots/${last_hash}.dot"; then
+            echo "${hash}.dot" >> dots/diff.list        
+        fi
+        last_hash="$hash"
     done
 fi
 echo "Calling dotimate"
 cd dots
 
 if [ ! -d frames ]; then
-    dotimate `cat index.list`
+    dotimate `cat diff.list`
 fi
 
 echo "Fixing image sizes"
